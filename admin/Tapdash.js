@@ -1,0 +1,82 @@
+import React, { useEffect, useState } from 'react'
+import Admin from '../Nav/Admin'
+import { data, Link, useParams } from 'react-router-dom'
+
+const Tapdash = () => {
+
+  const {id} = useParams()
+
+
+  const[lap, setLap] = useState([])
+
+  useEffect(()=>{
+    fetch("http://localhost:4000/gettablet").then((res)=>res.json()).then((data)=>setLap(data))
+  },[])
+
+  const handleDelete = (id) => {
+    fetch(`http://localhost:4000/tablet/${id}`,{
+      method:"delete",
+      headers:{
+        "content-type":"application/json"
+      },
+    }).then((res)=> res.json()).then((data)=> {
+      alert("Item removed")
+      setLap(lap.filter((item)=> item._id !==id))
+      window.location.href = "/tablets"
+    })
+  }
+  return (
+        <>
+   <div className="container-fluid">
+  <div className="row">
+    <div className="col-9 col-md-2 bg-primary text-white min-vh-100 p-3">
+      <Admin/> 
+    </div>
+
+    <div className="col-9  mt-5">
+      <h5>Tablet Dashboard</h5>
+     <Link to="/tapupload"><button className='btn btn-success'>Add Data</button></Link> 
+      <div className="table-responsive">
+        <table className="table table-bordered table-striped">
+          <thead className="table-dark">
+            <tr>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Description</th>
+              <th>Image</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              lap.map((item)=>(
+                <tr key={item._id}>
+                  <td>{item.title}</td>
+                  <td>{item.price}</td>
+                  <td>{item.des}</td>
+                  <td><img src={item.img} width={100}></img></td>
+                  <td>
+                          <Link to={`/tapedit/${item._id}`}>
+                           <button className='btn btn-success'>edit</button> 
+                           </Link>
+                  
+                           <button 
+                             className='btn btn-danger'
+                             onClick={()=> handleDelete(item._id)}
+                             >delete</button></td>
+                                  </tr>
+              ))
+            }
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+    </>
+  )
+}
+
+export default Tapdash
